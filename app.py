@@ -1,33 +1,42 @@
-import pandas as pd
+iimport pandas as pd
 import plotly.express as px
 import streamlit as st
 
+# --- Configuración de la página ---
+st.set_page_config(
+    page_title="AutoInsights Dashboard",
+    page_icon="🚗",
+    layout="wide"
+)
 
-st.header("Dashboard S4 aplicasion de Cars API")
+st.title("🚗 AutoInsights Dashboard")
+st.markdown("""
+Este dashboard te permite explorar datos reales de anuncios de ventas de vehículos en EE.UU.
+Usa los controles para generar visualizaciones interactivas.
+""")
 
-car_data = pd.read_csv('vehicles_us.csv')  # leer los datos
-hist_button = st.button('Construir histograma')  # crear un botón
+# --- Cargar datos ---
+@st.cache_data
+def load_data():
+    return pd.read_csv("vehicles_us.csv")
 
-if hist_button:  # al hacer clic en el botón
-    # escribir un mensaje
-    st.write(
-        'Creación de un histograma para el conjunto de datos de anuncios de venta de coches')
+car_data = load_data()
 
-    # crear un histograma
+st.sidebar.header("Opciones de Visualización")
+st.sidebar.markdown("Selecciona qué gráficos quieres generar.")
+
+# --- Histograma ---
+if st.sidebar.checkbox("Mostrar Histograma (Odometer)", value=True):
+    st.subheader("Distribución del Odómetro")
     fig = px.histogram(car_data, x="odometer")
-
-    # mostrar un gráfico Plotly interactivo
     st.plotly_chart(fig, use_container_width=True)
 
-disp_button = st.checkbox(
-    'Construir un grafico de dispercion')  # crear un botón
+# --- Gráfico de Dispersión ---
+if st.sidebar.checkbox("Mostrar Dispersión (Odometer vs Price)", value=True):
+    st.subheader("Relación entre Odómetro y Precio")
+    fig2 = px.scatter(car_data, x="odometer", y="price")
+    st.plotly_chart(fig2, use_container_width=True)
 
-if disp_button:  # al hacer clic en el botón
-    # escribir un mensaje
-    st.write('Creación de una dispersion graficada para el conjunto de datos de anuncios de venta de coches')
-
-    # crear un grafico de dispersion
-    fig = px.scatter(car_data, x="odometer", y="price")
-
-    # mostrar un gráfico Plotly interactivo
-    st.plotly_chart(fig, use_container_width=True)
+# --- Footer ---
+st.markdown("---")
+st.caption("Desarrollado por Alexander  Herrera — Proyecto educativo para análisis de datos.")
